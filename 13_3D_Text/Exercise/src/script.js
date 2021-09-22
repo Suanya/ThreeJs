@@ -19,7 +19,7 @@ const scene = new THREE.Scene()
 
 // Axes Helper
 const axesHelper = new THREE.AxesHelper()
-scene.add(axesHelper)
+//scene.add(axesHelper)
 
 /**
  * Textures
@@ -36,7 +36,7 @@ fontLoader.load(
     (font) =>
     {
         const textGeometry = new THREE.TextGeometry(
-            'SnowFest',
+            'EyeWant',
             {
                 font: font,
                 size: 0.5,
