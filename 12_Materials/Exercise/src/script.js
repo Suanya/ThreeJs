@@ -1,6 +1,12 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import * as dat from 'dat.gui'
+
+/**
+ * Debug
+ */
+const gui = new dat.GUI()
 
 /**
  * Textures
@@ -18,6 +24,11 @@ const doorRoughnessTexture = TextureLoader.load('/textures/door/roughness.jpg')
 
 const matcapTexture = TextureLoader.load('/textures/matcaps/8.png')
 const gradientTexture = TextureLoader.load('/textures/gradients/3.png')
+gradientTexture.minFilter = THREE.NearestFilter
+gradientTexture.magFilter = THREE.NearestFilter
+gradientTexture.generateMipmaps = false
+
+
 
 /**
  * Base
@@ -50,9 +61,24 @@ const material = new THREE.MeshMatcapMaterial()
 material.matcap = matcapTexture
 
 const material = new THREE.MeshDepthMaterial()
-*/
 
 const material = new THREE.MeshLambertMaterial()
+
+const material = new THREE.MeshPhongMaterial()
+material.shininess = 50
+material.specular = new THREE.Color(0x1188ff)
+
+const material = new THREE.MeshToonMaterial()
+material.gradientMap = gradientTexture
+*/
+
+const material = new THREE.MeshStandardMaterial()
+material.metalness = 0.45
+material.roughness = 0.65
+
+gui.add(material, 'metalness').min(0).max(1).step(0.0001)
+gui.add(material, 'roughness').min(0).max(1).step(0.0001)
+
 
 const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 16, 16),
