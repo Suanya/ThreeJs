@@ -4,8 +4,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'dat.gui'
 import CANNON from 'cannon'
 
-console.log(CANNON)
-
 /**
  * Debug
  */
@@ -38,61 +36,37 @@ const environmentMapTexture = cubeTextureLoader.load([
 /**
  * Physics
  */
+
 // World
 const world = new CANNON.World()
-world.gravity.set(0, - 9.82, 0)
+world.gravity.set(0, -9.82, 0)
 
 // Materials
-const concreteMaterial = new CANNON.Material('concrete')
-const plasticMaterial = new CANNON.Material('plastic')
-
-const concretePlasticContactMaterial = new CANNON.ContactMaterial(
-    concreteMaterial,
-    plasticMaterial,
+const defaultMaterial = new CANNON.Material ('default')
+const defaultContactMaterial = new CANNON.ContactMaterial(
+    defaultMaterial,
+    defaultMaterial,
     {
         friction: 0.1,
-        restitution: 0.7 // bounce, default is 0.3
+        restitution: 0.85 // default value 0.3 - PowerUP
     }
 )
-world.addContactMaterial(concretePlasticContactMaterial)
-// Sphere
-const sphereShape = new CANNON.Sphere(0.5)
-const sphereBody = new CANNON.Body({
-    mass: 1,
-    position: new CANNON.Vec3(0, 3, 0),
-    shape: sphereShape,
-    material: plasticMaterial
-})
-world.addBody(sphereBody)
+world.addContactMaterial(defaultContactMaterial)
+world.defaultContactMaterial = defaultContactMaterial
+
+
 
 // Floor
 const floorShape = new CANNON.Plane()
 const floorBody = new CANNON.Body()
-floorBody.material = concreteMaterial
-floorBody.mass = 0 // Object is static & won't move 
-floorBody.addShape = (floorShape) // multiple (in a row, underneath eachother, c&p) is possible
+floorBody.material = defaultMaterial
+floorBody.mass = 0
+floorBody.addShape(floorShape)
 floorBody.quaternion.setFromAxisAngle(
-    new CANNON.Vec3( - 1, 0, 0),
+    new CANNON.Vec3(- 1, 0, 0),
     Math.PI * 0.5
 )
 world.addBody(floorBody)
-
-
-
-/**
- * Test sphere
- */
-const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 32, 32),
-    new THREE.MeshStandardMaterial({
-        metalness: 0.3,
-        roughness: 0.4,
-        envMap: environmentMapTexture
-    })
-)
-sphere.castShadow = true
-sphere.position.y = 0.5
-scene.add(sphere)
 
 /**
  * Floor
@@ -174,6 +148,41 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 /**
+ * Utils
+ */
+const createSphere = (radius, position) =>
+{
+    // Three.js mesh
+    const mesh = new THREE.Mesh(
+        new THREE.SphereBufferGeometry(radius, 20, 20),
+        new THREE.MeshStandardMaterial({
+            metalness: 0.3,
+            roughness: 0.5,
+            envMa: environmentMapTexture
+        })
+        )
+        mesh.castShadow = true
+        mesh.position.copy(position)
+        scene.add(mesh)
+        
+}
+
+// Cannon.js body
+const shape = new CANNON.Sphere(radius)
+
+const body = new CANNON.Body({
+    mass: 1,
+    position: new CANNON.Vec3(0, 3, 0),
+    shape: shape,
+    material: defaultMaterial
+})
+body.position.copy(position)
+world.addBody(body)
+
+
+
+
+/**
  * Animate
  */
 const clock = new THREE.Clock()
@@ -185,13 +194,9 @@ const tick = () =>
     const deltaTime = elapsedTime - oldElapsedTime
     oldElapsedTime = elapsedTime
     
+    // UpdatePhysicsWorld
+    world.step(1/60, deltaTime, 3)
 
-    // Update PhysicWorld
-    world.step(1/60, deltaTime, 3) // provide parameters (fixed timestep, time past since last step, how much iteration the wold can provide to catch up for potential delay)
-
-    // Take coord of SphereBody & apply them to the sphere
-    sphere.position.copy(sphereBody.position)
-    
     // Update controls
     controls.update()
 
@@ -204,19 +209,77 @@ const tick = () =>
 
 tick()
 
-// FirstApproaches & good to remember
+/**
+ * Remember
+ */
 /**
  * Animate
  */
 /*
-    // Update PhysicWorld
-    world.step(1/60, deltaTime, 3) // provide parameters (fixed timestep, time past since last step, how much iteration the wold can provide to catch up for potential delay)
+// UpdatePhysicsWorld
+    world.step(1/60, deltaTime, 3)
 
-    // Take coord of SphereBody & apply them to the sphere
     sphere.position.x = sphereBody.position.x
     sphere.position.y = sphereBody.position.y
     sphere.position.z = sphereBody.position.z
 
-    Becomes in short:
-    sphere.position.copy(sphereBody.position)
+    becomes sphere.position.copy()
 */
+
+/**
+ * Physics
+ */
+/*
+// Materials LongWay
+const concreteMaterial = new CANNON.Material ('concrete')
+const plasticMaterial = new CANNON.Material ('plastic')
+
+const concretePlasticContactMaterial = new CANNON.ContactMaterial(
+    concreteMaterial,
+    plasticMaterial,
+    {
+        friction: 0.1,
+        restitution: 0.85 // default value 0.3 - PowerUP
+    }
+*/
+
+/*
+// Sphere
+const sphereShape = new CANNON.Sphere(0.5) // same radius like parallel 3.js Sphere
+const sphereBody = new CANNON.Body(
+    {
+        mass: 1, 
+        position: new CANNON.Vec3(0, 3, 0),
+        shape: sphereShape,
+        material: defaultMaterial
+    }
+)
+sphereBody.applyLocalForce(new CANNON.Vec3(150, 0, 0), new CANNON.Vec3(0, 0, 0))
+world.addBody(sphereBody)
+*/
+
+/*
+  // Test sphere ... who knows where this comes from
+    const sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(0.5, 32, 32),
+        new THREE.MeshStandardMaterial({
+            metalness: 0.3,
+            roughness: 0.4,
+            envMap: environmentMapTexture
+        })
+    )
+    sphere.castShadow = true
+    sphere.position.y = 0.5
+    scene.add(sphere)
+ */
+
+/*
+// We have nothing but at least we have no error
+ UpdatePhysicsWorld
+    // sphereBody.applyForce(new CANNON.Vec3(-0.5, 0, 0), sphereBody.position)
+
+    world.step(1/60, deltaTime, 3)
+
+    // sphere.position.copy(sphereBody.position)
+*/
+ 
