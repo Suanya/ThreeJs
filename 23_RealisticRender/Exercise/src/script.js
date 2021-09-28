@@ -3,6 +3,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'dat.gui'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+// import { PCFShadowMap } from 'three'
+// import { dir } from 'console'
 
 /**
  * Loaders
@@ -10,12 +12,12 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 const gltfLoader = new GLTFLoader()
 const cubeTextureLoader = new THREE.CubeTextureLoader()
 
-
 /**
  * Base
  */
 // Debug
 const gui = new dat.GUI()
+const debugObject = {}
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -24,36 +26,56 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 /**
+ * Update all materials
+ */
+const updateAllMaterials = () =>
+{
+    scene.traverse((child) =>
+    {
+        if(child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial)
+        {
+            // child.material.envMap = environmentMap // Because of scene.environment = environmentMap in /*EnvironmentMap*/
+            child.material.envMapIntensity = debugObject.envMapIntensity
+            child.material.needsUpdate = true
+            child.castShadow = true
+            child.receiveShadow = true
+        }
+    })
+}
+
+/**
  * EnvironmentMap
  */
 const environmentMap = cubeTextureLoader.load([
-    '/textures/environmentMaps/0/px.jpg',
-    '/textures/environmentMaps/0/nx.jpg',
-    '/textures/environmentMaps/0/py.jpg',
-    '/textures/environmentMaps/0/ny.jpg',
-    '/textures/environmentMaps/0/pz.jpg',
-    '/textures/environmentMaps/0/nz.jpg'
+    '/textures/environmentMaps/1/px.jpg',
+    '/textures/environmentMaps/1/nx.jpg',
+    '/textures/environmentMaps/1/py.jpg',
+    '/textures/environmentMaps/1/ny.jpg',
+    '/textures/environmentMaps/1/pz.jpg',
+    '/textures/environmentMaps/1/nz.jpg'
 ])
+environmentMap.encoding = THREE.sRGBEncoding
 scene.background = environmentMap
+scene.environment = environmentMap
+
+debugObject.envMapIntensity = 5
+gui.add(debugObject, 'envMapIntensity').min(0).max(10).step(0.001).onChange(updateAllMaterials)
 
 /**
  * Models
  */
 gltfLoader.load(
-    '/models/FlightHelmet/glTF/FlightHelmet.gltf',
+    '/models/hamburger_lesson23.glb',
     (gltf) =>
     {
-        gltf.scene.scale.set(10, 10, 10)
-        gltf.scene.position.set(0, -4, 0)
+        gltf.scene.scale.set(0.7, 0.7, 0.7)
+        gltf.scene.position.set(0, -1, 0)
         gltf.scene.rotation.y = Math.PI * 0.5
         scene.add(gltf.scene)
 
-        gui
-        .add(gltf.scene.rotation, 'y')
-        .min(-Math.Pi)
-        .max(Math.PI)
-        .step(0.001)
-        .name('rotation')
+        gui.add(gltf.scene.rotation, 'y').min(- Math.PI).max(Math.PI).step(0.001).name('rotation')
+
+        updateAllMaterials()
     }
 )
 
@@ -62,7 +84,14 @@ gltfLoader.load(
  */
 const directionalLight = new THREE.DirectionalLight('#ffffff', 3)
 directionalLight.position.set(0.25, 3, - 2.25)
+directionalLight.castShadow = true
+directionalLight.shadow.camera.far = 15
+directionalLight.shadow.mapSize.set = (1024, 1024)
+directionalLight.shadow.normalBias = 0.05
 scene.add(directionalLight)
+
+// const directionalLightCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera)
+// scene.add(directionalLightHelper)
 
 gui.add(directionalLight, 'intensity').min(0).max(10).step(0.001).name('lightIntensity')
 gui.add(directionalLight.position, 'x').min(-5).max(5).step(0.001).name('lightX')
@@ -108,11 +137,36 @@ controls.enableDamping = true
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
-})
+    canvas: canvas,
+    antialias: true // no StairLikeEffect!! Yeah!
+    })
+
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.physicallyCorrectLights = true
+renderer.outputEncoding = THREE.sRGBEncoding // makes it way more realistic and nicer light
+renderer.toneMapping = THREE.ReinhardToneMapping
+renderer.toneMappingExposure = 3
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
+gui
+    .add(renderer, 'toneMapping', {
+        No: THREE.NoToneMapping,
+        Linear: THREE.LinearToneMapping,
+        Reinhard: THREE.ReinhardToneMapping,
+        Cineon: THREE.CineonToneMapping,
+        ACESFilmic: THREE.ACESFilmicToneMapping
+    })
+    .onFinishChange(() =>
+    {
+        renderer.toneMapping = Number(renderer.toneMapping)
+        updateAllMaterials()
+    })
+
+gui.add(renderer, 'toneMappingExposure').min(0).max(10).step(0.001)
+
+
 
 /**
  * Animate
@@ -143,3 +197,22 @@ const testSphere = new THREE.Mesh(
 )
 scene.add(testSphere)
 */
+
+/**
+ * Models
+ */
+/*
+ gltfLoader.load(
+    '/models/FlightHelmet/glTF/FlightHelmet.gltf',
+    (gltf) =>
+    {
+        gltf.scene.scale.set(10, 10, 10)
+        gltf.scene.position.set(0, -4, 0)
+        gltf.scene.rotation.y = Math.PI * 0.5
+        scene.add(gltf.scene)
+
+        gui.add(gltf.scene.rotation, 'y').min(- Math.PI).max(Math.PI).step(0.001).name('rotation')
+
+        updateAllMaterials()
+    }
+)*/
