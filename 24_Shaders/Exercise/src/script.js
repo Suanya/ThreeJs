@@ -2,15 +2,9 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'dat.gui'
-
 import testVertexShader from './shaders/test/vertex.glsl'
 import testFragmentShader from './shaders/test/fragment.glsl'
-
-console.log(testFragmentShader)
-console.log(testVertexShader)
-
-
-
+import { DoubleSide } from 'three'
 
 /**
  * Base
@@ -28,6 +22,7 @@ const scene = new THREE.Scene()
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
+const flagTexture = textureLoader.load('/textures/flag-eyewant-pink.jpg')
 
 /**
  * Test mesh
@@ -35,16 +30,38 @@ const textureLoader = new THREE.TextureLoader()
 // Geometry
 const geometry = new THREE.PlaneGeometry(1, 1, 32, 32)
 
+const count = geometry.attributes.position.count
+const randoms = new Float32Array(count)
+
+for(let i = 0; i < count; i++)
+{
+    randoms[i] = Math.random()
+}
+geometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1))
+
 // Material
 const material = new THREE.ShaderMaterial({
     vertexShader: testVertexShader,
-    fragmentShader: testFragmentShader
+    fragmentShader: testFragmentShader,
+    side: DoubleSide,
+    transparent: true,
+
+    uniforms: // u in front protects u (from bugs)
+    {
+        uFrequency: {value: new THREE.Vector2(10, 5)},
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color('yellow')},
+        uTexture: { value: flagTexture}
+    }
 })
 
+gui.add(material.uniforms.uFrequency.value, 'x').min(0).max(20).step(0.01).name('frequencyX')
+gui.add(material.uniforms.uFrequency.value, 'y').min(0).max(20).step(0.01).name('frequencyY')
 
 
 // Mesh
 const mesh = new THREE.Mesh(geometry, material)
+mesh.scale.y = 2 / 5
 scene.add(mesh)
 
 /**
@@ -100,6 +117,9 @@ const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
 
+    // Updat materials
+    material.uniforms.uTime.value = elapsedTime
+
     // Update controls
     controls.update()
 
@@ -112,35 +132,6 @@ const tick = () =>
 
 tick()
 
-// SafetySafe
-/**
- * Test mesh
- */
 /*
-// Geometry
-const geometry = new THREE.PlaneGeometry(1, 1, 32, 32)
 
-// Material
-const material = new THREE.RawShaderMaterial({
-    vertexShader: `         
-    uniform mat4 projectionMatrix;
-    uniform mat4 viewMatrix;
-        uniform mat4 modelMatrix;
-
-    attribute vec3 position;
-
-    void main()
-    {
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-    }
-    `, 
-    fragmentShader: `
-        precision mediump float;
-
-        void main()
-        {
-            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-        }
-    `
-})
 */
