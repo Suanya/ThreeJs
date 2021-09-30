@@ -8,8 +8,10 @@ import { DotScreenPass } from 'three/examples/jsm/postprocessing/DotScreenPass.j
 import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
 import { RGBShiftShader } from 'three/examples/jsm/shaders/RGBShiftShader.js'
+import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
 import * as dat from 'dat.gui'
-import { LinearFilter, RGBAFormat } from 'three'
+
 
 
 /**
@@ -145,11 +147,26 @@ renderer.toneMappingExposure = 1.5
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
+console.log(renderer.capabilities)
+
 /**
  * PostProcessing
  */
 // Render Target
-const renderTarget = new THREE.WebGLMultisampleRenderTarget(
+let RenderTargetClass = null
+
+if(renderer.getPixelRatio() === 1 && renderer.capabilities.isWebGL2)
+{
+    RenderTargetClass = THREE.WebGLMultisampleRenderTarget
+    console.log('Using WebGLMultisampleRenderTarget')
+}
+else
+{
+    RenderTargetClass = THREE.WebGLRenderTarget
+    console.log('Using WebGLRenderTarget')
+}
+
+const renderTarget = new RenderTargetClass( // WebGLMultisampleRenderTarget for Safari!!!
     800,
     600,
     {
@@ -166,26 +183,130 @@ const effectComposer = new EffectComposer(renderer, renderTarget)
 effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 effectComposer.setSize(sizes.width, sizes.height)
 
-// Passes
+// Rende pass
 const renderPass = new RenderPass(scene, camera)
 renderPass.enabled = true
 effectComposer.addPass(renderPass)
 
+// Dot screen pass
 const dotScreenPass = new DotScreenPass() // Geht nicht
 dotScreenPass.enabled = false
 effectComposer.addPass(dotScreenPass)
 
+// Glitches pass
 const glitchPass = new GlitchPass() 
 glitchPass.goWild = false
 glitchPass.enabled = false
 effectComposer.addPass(glitchPass)
 
+// Rgb shift pass
 const rgbShiftPass = new ShaderPass(RGBShiftShader)
-rgbShiftPass.enabled = true
+rgbShiftPass.enabled = false
 effectComposer.addPass(rgbShiftPass)
 
+// Unreal bloom pass
+const unrealBloomPass = new UnrealBloomPass()
+unrealBloomPass.enabled = true
+unrealBloomPass.strength = 0.3
+unrealBloomPass.radius = 1
+unrealBloomPass.threshold = 0.6
+effectComposer.addPass(unrealBloomPass)
+
+gui.add(unrealBloomPass, 'enabled')
+gui.add(unrealBloomPass, 'strength').min(0).max(2).step(0.001)
+gui.add(unrealBloomPass, 'radius').min(0).max(2).step(0.001)
+gui.add(unrealBloomPass, 'threshold').min(0).max(2).step(0.001)
+
+// Tint pass
+const TintShader = {
+    uniforms: 
+    {
+        tDiffuse: { value: null },
+        uTint: { value: null }
+    },
+    vertexShader:`
+        varying vec2 vUv;
+
+        void main()
+        {
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+
+            vUv = uv;
+        }
+    `,
+    fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform vec3 uTint;
+
+        varying vec2 vUv;
+
+        void main()
+        {
+            vec4 color = texture2D(tDiffuse, vUv );
+            color.rgb += uTint;
+            gl_FragColor = color;
+        }
+    `
+}
+const tintPass = new ShaderPass(TintShader)
+tintPass.material.uniforms.uTint.value = new THREE.Vector3()
+effectComposer.addPass(tintPass)
+
+gui.add(tintPass.material.uniforms.uTint.value, 'x').min(-1).max(1).step(0.001).name('red')
+gui.add(tintPass.material.uniforms.uTint.value, 'y').min(-1).max(1).step(0.001).name('blue')
+gui.add(tintPass.material.uniforms.uTint.value, 'z').min(-1).max(1).step(0.001).name('green')
+
+// Displacement pass
+const DisplacementShader = {
+    uniforms:
+    {
+        tDiffuse: { value: null },
+        uNormalMap: { value: null }
+        
+    },
+    vertexShader: `
+        varying vec2 vUv;
+
+        void main()
+        {
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+
+            vUv = uv;
+        }
+    `,
+    fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform sampler2D uNormalMap;
+
+        varying vec2 vUv;
+
+        void main()
+        {
+            vec3 normalColor = texture2D(uNormalMap, vUv).xyz * 2.0 - 1.0;
+
+            vec2 newUv = vUv + normalColor.xy * 0.1;
+            vec4 color = texture2D(tDiffuse, newUv);
+
+            vec3 lightDirection = normalize(vec3(- 1.0, 1.0, 0.0));
+            float lightness = clamp(dot(normalColor, lightDirection), 0.0, 1.0);
+            color.rgb += lightness * 2.0;
 
 
+            gl_FragColor = color;
+        }
+    `
+}
+const displacementPass = new ShaderPass(DisplacementShader)
+displacementPass.material.uniforms.uNormalMap.value = textureLoader.load('/textures/interfaceNormalMap.png')
+effectComposer.addPass(displacementPass)
+
+if(renderer.getPixelRatio() === 1 && !renderer.capabilities.isWebGL2)
+{
+    const smaaPass = new SMAAPass() 
+    effectComposer.addPass(smaaPass)    
+
+    console.log('using SMAA')
+}
 
 
 /**
@@ -196,6 +317,7 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+
 
     // Update controls
     controls.update()
@@ -210,3 +332,57 @@ const tick = () =>
 }
 
 tick()
+
+// Always remember
+/**
+ * Renderer
+ */
+// CheckBrowerCompabilities
+// console.log(renderer.capabilities) -> WebGL 2 needed for WebGLMultisamplerRenderTarget!!!
+
+// DisplacementMap - DrunkWave
+/*
+const DisplacementShader = {
+    uniforms:
+    {
+        tDiffuse: { value: null },
+        
+    },
+    vertexShader: `
+        varying vec2 vUv;
+
+        void main()
+        {
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+
+            vUv = uv;
+        }
+    `,
+    fragmentShader: `
+        uniform sampler2D tDiffuse;
+        
+
+        varying vec2 vUv;
+
+        void main()
+        {
+            vec2 newUv = vec2(
+                vUv.x,
+                vUv.y + sin(vUv.x * 10.0 + uTime) * 0.1
+            );
+            
+            vec4 color = texture2D(tDiffuse, newUv);
+
+            gl_FragColor = color;
+        }
+    `
+}
+const displacementPass = new ShaderPass(DisplacementShader)
+displacementPass.material.uniforms.uTime.value = 0
+effectComposer.addPass(displacementPass)
+
+tick()
+
+    // Update passes
+    displacementPass.material.uniforms.uTime.value = elapsedTime
+*/
