@@ -323,3 +323,19 @@ tick()
 // const shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial)
 // shaderMesh.rotation.x = - Math.PI * 0.5
 // scene.add(shaderMesh)
+
+
+// KeepInMind
+/**
+ * Chrome FPS
+ */
+// FPS NoLimit
+/*
+open -a "Google Chrome" --args --disable-gpu-vsync --disable-frame-rate-limit
+*/
+
+// FPS Limit 60
+/*
+ open  -a "Google Chrome" --args --enable-gpu-vsync -enable-frame-rate-limit
+*/
+
