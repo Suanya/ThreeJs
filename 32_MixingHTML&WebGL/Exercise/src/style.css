@@ -1,0 +1,96 @@
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body
+{
+    overflow: hidden;
+}
+
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+}
+
+.loading-bar
+{
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    height: 2px;
+    background: #ffffff;
+    transform: scaleX(0.3);
+    transform-origin: top left;
+    transition: transform 0.5s;
+}
+
+.loading-bar.ended
+{
+    transform: scaleX(0);
+    transform-origin: 100% 0;
+    transition: transform 1.5s ease-in-out;
+}
+
+.point
+{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+.point .label
+{
+    position: absolute;
+    top: -1.25rem;
+    left: -1.25rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: #00000077;
+    /* opacity: 0.5; */
+    color: #ffffff;
+    font-family: Helvetica, Arial, sans-serif;
+    text-align: center;
+    line-height: 2.5rem;
+    cursor: help;
+    transform: scale(0.001, 0.001);
+    transition: transform 0.3s;
+    
+}
+
+.point.visible .label
+{
+    transform: scale(1, 1);
+}
+
+.point:hover .text
+{
+    opacity: 1;
+}
+
+.point .text
+{
+    /*display: none;*/
+    position: absolute;
+    top: 1.875rem;
+    left: -6.25rem;
+    width: 12.5rem;
+    padding: 1.25rem;
+    border-radius: 0.25rem;
+    background: #00000077;
+    color: #ffffff;
+    line-height: 1.3em;
+    font-family: Helvetica, Arial, sans-serif;
+    text-align: center;
+    font-weight: 100;
+    font-size: 0.875;
+    opacity: 0;
+    transition: opacity 0.7s;
+    pointer-events: none;
+}

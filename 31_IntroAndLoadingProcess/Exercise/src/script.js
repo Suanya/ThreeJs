@@ -26,7 +26,6 @@ const loadingManager = new THREE.LoadingManager(
     {
         const progressRatio = itemsLoaded / itemsTotal
         loadingBarElement.style.transform = `scaleX(${progressRatio})`
-       
     }
 )
 const gltfLoader = new GLTFLoader(loadingManager)
