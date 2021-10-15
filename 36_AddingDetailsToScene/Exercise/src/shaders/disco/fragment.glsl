@@ -82,10 +82,20 @@ float cnoise(vec3 P)
 void main ()
 {
     // Displace the UV
-    vec2 displacedUv = vUv + cnoise(vec3(vUv * 5.0, uTime));
+    vec2 displacedUv = vUv + cnoise(vec3((sin(vUv) + 0.5 + 0.5) * 2.0, uTime * 0.1));
 
-    // float strength = cnoise(vec3(vUv * 5.0, uTime));
-    // gl_FragColor = vec4(strength, strength, strength, 1.0);
+    // Perlin noise
+    float strength = cnoise(vec3(displacedUv * 5.0, uTime * 0.2));
 
-    gl_FragColor = vec4(displacedUv, 1.0, 1.0);
+    // Outer glow
+    float outerGlow = distance(vUv, vec2(0.5)) * 5.0 - 1.4;
+    strength += outerGlow;
+
+    // Apply cool step
+    strength += step(- 0.2, strength) * 0.8;
+    
+
+    gl_FragColor = vec4(strength, strength, strength, 1.0);
+
+    // gl_FragColor = vec4(displacedUv, 1.0, 1.0);
 }
