@@ -57,14 +57,37 @@ const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
 const lampLightMaterial = new THREE.MeshBasicMaterial({ color: 0x3E1C0F })
 
 // Portal light material
+debugObject.discoColorStart = '#0000ff'
+debugObject.discoColorEnd = '#000f00'
+
+gui
+    .addColor(debugObject, 'discoColorStart')
+    .onChange(() =>
+    {
+        discoMaterial.uniforms.uColorStart.value.set(debugObject.discoColorStart)
+    })
+
+gui
+    .addColor(debugObject, 'discoColorEnd')
+    .onChange(() =>
+    {
+        discoMaterial.uniforms.uColorEnd.value.set(debugObject.discoColorEnd)
+    })
+
 const discoMaterial = new THREE.ShaderMaterial({ 
     uniforms:
     {
-        uTime: { value: 0 }
+        uTime: { value: 0 },
+        uColorStart: { value: new THREE.Color(0x0000ff) },
+        uColorEnd: { value: new THREE.Color(0x000f00) }
     },
     vertexShader: discoVertexShader,
     fragmentShader: discoFragmentShader
  })
+
+
+
+ 
 
 /**
  * Model
