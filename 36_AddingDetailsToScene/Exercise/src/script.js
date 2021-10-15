@@ -9,7 +9,6 @@ import firefliesFragmentShader from './shaders/fireflies/fragment.glsl'
 import discoVertexShader from './shaders/disco/vertex.glsl'
 import discoFragmentShader from './shaders/disco/fragment.glsl'
 
-console.log(discoVertexShader, discoFragmentShader)
 
 
 /**
@@ -59,6 +58,10 @@ const lampLightMaterial = new THREE.MeshBasicMaterial({ color: 0x3E1C0F })
 
 // Portal light material
 const discoMaterial = new THREE.ShaderMaterial({ 
+    uniforms:
+    {
+        uTime: { value: 0 }
+    },
     vertexShader: discoVertexShader,
     fragmentShader: discoFragmentShader
  })
@@ -105,7 +108,7 @@ for (let i = 0; i < firefliesCount; i++)
 }
 firefliesGeometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3))
 firefliesGeometry.setAttribute('aScale', new THREE.BufferAttribute(scaleArray, 1))
-console.log(scaleArray)
+
 
 // Material
 const firefliesMaterial = new THREE.ShaderMaterial({ 
@@ -202,6 +205,7 @@ const tick = () =>
 
     // Update materials
     firefliesMaterial.uniforms.uTime.value = elapsedTime
+    discoMaterial.uniforms.uTime.value = elapsedTime
 
     // Update controls
     controls.update()
