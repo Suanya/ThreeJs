@@ -86,15 +86,20 @@ const discoMaterial = new THREE.MeshBasicMaterial({ color: 0xFA5BFF })
 const firefliesGeometry = new THREE.BufferGeometry()
 const firefliesCount = 30
 const positionArray = new Float32Array(firefliesCount * 3)
+const scaleArray = new Float32Array(firefliesCount * 1)
 
 for (let i = 0; i < firefliesCount; i++)
 {
     positionArray[ i * 3 + 0] = (Math.random() - 0.5) * 4
     positionArray[ i * 3 + 1] = Math.random() * 1.5
     positionArray[ i * 3 + 2] = (Math.random() - 0.5) * 4
+
+    scaleArray[i] = Math.random()
+    
 }
 firefliesGeometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3))
-console.log(firefliesGeometry)
+firefliesGeometry.setAttribute('aScale', new THREE.BufferAttribute(scaleArray, 1))
+console.log(scaleArray)
 
 // Material
 const firefliesMaterial = new THREE.ShaderMaterial({ 
@@ -105,7 +110,9 @@ const firefliesMaterial = new THREE.ShaderMaterial({
     },
     vertexShader: firefliesVertexShader,
     fragmentShader: firefliesFragmentShader,
-    transparent: true
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
 })
 
 gui.add(firefliesMaterial.uniforms.uSize, 'value').min(0).max(500).step(1).name('firefliesSize')
