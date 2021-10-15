@@ -50,7 +50,7 @@ const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
 const lampLightMaterial = new THREE.MeshBasicMaterial({ color: 0x3E1C0F })
 
 // Disco Material
-const discoMaterial = new THREE.MeshBasicMaterial({ color: 0xFA5BFF})
+const discoMaterial = new THREE.MeshBasicMaterial({ color: 0xFA5BFF }) // { color: 0xFA5BFF, side: THREE.DoubleSide}
 
 /**
  * Model
@@ -59,15 +59,12 @@ gltfLoader.load(
     'myportal.glb',
     (gltf) =>
     {
-        gltf.scene.traverse((child) =>
-        {
-            child.material = bakedMaterial
-        })
-
+        const bakedMesh = gltf.scene.children.find(child => child.name === 'baked')
         const discoMesh = gltf.scene.children.find(child => child.name === 'Disco')
         const lampLightMesh = gltf.scene.children.find(child => child.name === 'LampLight')
         const lampLight2Mesh = gltf.scene.children.find(child => child.name === 'LampLight2')
 
+        bakedMesh.material = bakedMaterial
         discoMesh.material = discoMaterial
         lampLightMesh.material = lampLightMaterial
         lampLight2Mesh.material = lampLightMaterial
