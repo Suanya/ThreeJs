@@ -6,7 +6,10 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import firefliesVertexShader from './shaders/fireflies/vertex.glsl'
 import firefliesFragmentShader from './shaders/fireflies/fragment.glsl'
+import discoVertexShader from './shaders/disco/vertex.glsl'
+import discoFragmentShader from './shaders/disco/fragment.glsl'
 
+console.log(discoVertexShader, discoFragmentShader)
 
 
 /**
@@ -55,7 +58,10 @@ const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
 const lampLightMaterial = new THREE.MeshBasicMaterial({ color: 0x3E1C0F })
 
 // Portal light material
-const discoMaterial = new THREE.MeshBasicMaterial({ color: 0xFA5BFF })
+const discoMaterial = new THREE.ShaderMaterial({ 
+    vertexShader: discoVertexShader,
+    fragmentShader: discoFragmentShader
+ })
 
 /**
  * Model
@@ -105,6 +111,7 @@ console.log(scaleArray)
 const firefliesMaterial = new THREE.ShaderMaterial({ 
     uniforms:
     {
+        uTime: { value: 0 },
         uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
         uSize: { value: 100 }
     },
@@ -192,6 +199,9 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+
+    // Update materials
+    firefliesMaterial.uniforms.uTime.value = elapsedTime
 
     // Update controls
     controls.update()
