@@ -34,23 +34,46 @@ const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
 
 /**
- * Object
+ * Textures
  */
-const cube = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshBasicMaterial()
-)
+const bakedTexture = textureLoader.load('myBaked.jpg')
+bakedTexture.flipY = false
+bakedTexture.encoding = THREE.sRGBEncoding
 
-scene.add(cube)
+/**
+ * Material
+ */
+// Baked material
+const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
+
+// LampLight Material
+const lampLightMaterial = new THREE.MeshBasicMaterial({ color: 0x3E1C0F })
+
+// Disco Material
+const discoMaterial = new THREE.MeshBasicMaterial({ color: 0xFA5BFF})
 
 /**
  * Model
  */
 gltfLoader.load(
     'myportal.glb',
-    () =>
+    (gltf) =>
     {
-        console.log('loaded')
+        gltf.scene.traverse((child) =>
+        {
+            child.material = bakedMaterial
+        })
+
+        const discoMesh = gltf.scene.children.find(child => child.name === 'Disco')
+        const lampLightMesh = gltf.scene.children.find(child => child.name === 'LampLight')
+        const lampLight2Mesh = gltf.scene.children.find(child => child.name === 'LampLight2')
+
+        discoMesh.material = discoMaterial
+        lampLightMesh.material = lampLightMaterial
+        lampLight2Mesh.material = lampLightMaterial
+
+        scene.add(gltf.scene)
+        
     }
 )
 
@@ -100,6 +123,8 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+renderer.outputEncoding = THREE.sRGBEncoding
 
 /**
  * Animate
