@@ -85,10 +85,6 @@ const discoMaterial = new THREE.ShaderMaterial({
     fragmentShader: discoFragmentShader
  })
 
-
-
- 
-
 /**
  * Model
  */
