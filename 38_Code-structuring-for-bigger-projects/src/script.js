@@ -1,62 +1,15 @@
-class Robot
-{
-    constructor(name, legs)
-    {
-        // 'this' is context
-        this.name = name
-        this.legs = legs
-
-
-        console.log(`Hello, my name is ${this.name}. Thank you, my creator!`)
-
-        this.sayHi()
-       
-    }
-    
-   
-
-    sayHi()
-    {
-        console.log(`Remember, my name is ${this.name}`)
-    }
-}
-
-class FlyingRobot extends Robot
-{
-    constructor(name, legs)
-    {
-        super(name, legs)
-    }
-    sayHi()
-    {
-        console.log(`Remember, my name is ${this.name} and I'm flying!` )
-    }
-    takeOff()
-    {
-        console.log(`Have a good flight, ${this.name}`)
-    }
-
-    land()
-    {
-        console.log(`Welcome back, ${this.name}`)
-    }
-}
-
-const wallE = new Robot('Wall-E', 0)
-const ultron = new FlyingRobot('Ultron', 2)
-const astroBoy = new FlyingRobot('Astro Boy', 2)
-
-
-
-
-
-
-
-
 // /**
 //  * Modules
 //  */
-// import './style.css'
+import './style.css'
+import Experience from './Experience/Experience'
+
+
+const experience = new Experience(document.querySelector('canvas.webgl'))
+
+console.log(experience)
+
+
 // import * as THREE from 'three'
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 // import * as dat from 'lil-gui'
