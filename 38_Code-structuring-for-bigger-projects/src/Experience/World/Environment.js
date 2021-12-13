@@ -11,7 +11,7 @@ export default class Environment
         this.resources = this.experience.resources
         
         this.setSunLight() 
-        this.setEnvironMap()
+        this.setEnvironmentMap()
     }
 
     setSunLight()
@@ -25,15 +25,15 @@ export default class Environment
         this.scene.add(this.sunLight)
     }
 
-    setEnvironMap()
+    setEnvironmentMap()
     {
         this.environmentMap = {}
         this.environmentMap.intensity = 0.4
         this.environmentMap.texture = this.resources.items.environmentMapTexture
-
+        this.environmentMap.texture.encoding = THREE.sRGBEncoding
         this.scene.environment = this.environmentMap.texture
 
-        this.environmentMap.updateMaterials = () =>
+        this.setEnvironmentMap.updateMaterial = () =>
         {
             this.scene.traverse((child) =>
             {
@@ -45,6 +45,6 @@ export default class Environment
                 }
             })
         }
-        this.environmentMap.updateMaterials()
+        this.setEnvironmentMap.updateMaterial()
     }
 }

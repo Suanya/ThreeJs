@@ -25,7 +25,7 @@ export default class Resources extends EventEmitter
         // draco still missing
         this.loaders = {}
         this.loaders.gltfLoader = new GLTFLoader()
-        this.loaders.textureLoaders = new THREE.TextureLoader()
+        this.loaders.textureLoader = new THREE.TextureLoader()
         this.loaders.cubeTextureLoader = new THREE.CubeTextureLoader()
     }
 
@@ -40,7 +40,7 @@ export default class Resources extends EventEmitter
                     source.path,
                     (file) =>
                     {
-                        this.sourceLoaded(source, file)
+                        console.log(source, file)
                     }
                 )
             }
@@ -50,7 +50,7 @@ export default class Resources extends EventEmitter
                     source.path,
                     (file) =>
                     {
-                        this.sourceLoaded(source, file)
+                        console.log(source, file)
                     }
                 )
             }
@@ -60,12 +60,13 @@ export default class Resources extends EventEmitter
                     source.path,
                     (file) =>
                     {
-                        this.sourceLoaded(source, file)
+                        console.log(source, file)
                     }
                 )
             }
         }
     }
+   
 
     sourceLoaded(source, file)
     {

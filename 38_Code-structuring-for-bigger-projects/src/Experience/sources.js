@@ -24,4 +24,5 @@ export default [
         type: 'texture',
         path: 'textures/dirt/normal.jpg'
     }
+
 ]
