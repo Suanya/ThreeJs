@@ -14,8 +14,8 @@ export default class Camera
         this.scene = this.experience.scene
         this.canvas = this.experience.canvas
 
-        this.setInstance
-        this.setControls
+        this.setInstance()
+        this.setControls()
     }
 
     setInstance()
