@@ -9,6 +9,8 @@ export default class Floor
         this.experience = new Experience()
         this.scene = this.experience.scene
         this.resources = this.experience.resources
+
+        
         
         this.setGeometry()
         this.setTextures()

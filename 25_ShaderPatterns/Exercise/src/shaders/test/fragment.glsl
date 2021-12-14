@@ -16,6 +16,7 @@ vec2 rotate(vec2 uv, float rotation, vec2 mid)
 }
 
 // LittleStar_Variation
+/*
 void main()
 {
     float pi = 3.1415926535897932384626433832795;
@@ -31,6 +32,7 @@ void main()
     
     gl_FragColor = vec4(strength, strength, strength, 1.0);
 }
+*/
 
 // LittleStar
 /*
