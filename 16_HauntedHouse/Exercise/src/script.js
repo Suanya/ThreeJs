@@ -81,7 +81,7 @@ house.add(walls)
 // Roof
 const roof = new THREE.Mesh(
     new THREE.ConeBufferGeometry(3.5, 1, 4),
-    new THREE.MeshStandardMaterial({color: '#b35f45'})
+    new THREE.MeshStandardMaterial({color: '#4D1738'})
 )
 roof.position.y = 2.5 + 1 / 2
 roof.rotation.y = Math.PI / 4
@@ -134,7 +134,7 @@ const graves = new THREE.Group()
 scene.add(graves)
 
 const graveGeometry = new THREE.BoxBufferGeometry(0.6, 0.8, 0.2)
-const graveMaterial = new THREE.MeshStandardMaterial({ color: '#b2b6b1'})
+const graveMaterial = new THREE.MeshStandardMaterial({ color: '#7B758D'})
 
 for(let i = 0; i < 50; i++)
 {
@@ -245,7 +245,7 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.setClearColor('#262837')
+renderer.setClearColor('#150621')
 
 /**
  * Shadows

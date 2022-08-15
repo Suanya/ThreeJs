@@ -138,7 +138,7 @@ world.addBody(floorBody)
 const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(10, 10),
     new THREE.MeshStandardMaterial({
-        color: '#777777',
+        color: '#150621',
         metalness: 0.3,
         roughness: 0.4,
         envMap: environmentMapTexture
@@ -256,8 +256,8 @@ createSphere(0.5, { x: 0, y: 3, z: 0})
 // Box
 const boxGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
 const boxMaterial = new THREE.MeshStandardMaterial({
-    metalness: 0.6,
-    roughness: 0.85,
+    metalness: 0.3,
+    roughness: 0.5,
     envMap: environmentMapTexture
 })
 
