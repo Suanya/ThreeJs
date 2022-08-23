@@ -11,7 +11,6 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
-
 /**
  * Textures
  */
@@ -22,7 +21,6 @@ const colorTexture = textureLoader.load('/textures/minecraft.png')
 colorTexture.generateMipmaps = false // better performance
 colorTexture.minFilter = THREE.NearestFilter
 colorTexture.magFilter = THREE.NearestFilter // NearestFilter for better results!
-
 
 /**
  * Object
@@ -97,5 +95,4 @@ const tick = () =>
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
 }
-
 tick()
