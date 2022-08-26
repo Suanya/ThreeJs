@@ -2,10 +2,6 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
-import {color, position, roughness} from "three/examples/jsm/nodes/shadernode/ShaderNodeBaseElements";
-import {CSS3DObject} from "three/examples/jsm/renderers/CSS3DRenderer";
-import {BoundingBox} from "three/examples/jsm/libs/opentype.module";
-
 
 /**
  * Base
@@ -21,60 +17,22 @@ const scene = new THREE.Scene()
  */
 const gui = new dat.GUI({ closed: true, width: 400 })
 
-
 /**
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
 
 const doorColorTexture = textureLoader.load('/textures/door/color.jpg')
-const doorAlphaTexture = textureLoader.load('/textures/door/alpha.jpg')
 const doorAmbientOcclusionTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
 const doorHeightTexture = textureLoader.load('/textures/door/height.jpg')
 const doorNormalTexture = textureLoader.load('/textures/door/normal.jpg')
 const doorMetalnessTexture = textureLoader.load('/textures/door/metalness.jpg')
 const doorRoughnessTexture = textureLoader.load('/textures/door/roughness.jpg')
-const matcapTexture = textureLoader.load('/textures/matcaps/9.png')
-
-const gradientTexture = textureLoader.load('/textures/gradients/3.jpg')
-gradientTexture.minFilter = THREE.NearestFilter
-gradientTexture.magFilter = THREE.NearestFilter
-gradientTexture.generateMipmaps = false
-
 
 /**
  * Objects
  */
 // Material
-    
-// const material = new THREE.MeshBasicMaterial()
-// material.map = doorAmbientOcclusionTexture
-// material.color = new THREE.Color('gold')
-// material.wireframe = true
-// material.opacity = 0.5
-// material.transparent = true
-// material.alphaMap = doorAlphaTexture
-// material.side = THREE.FrontSide
-// material.side = THREE.BackSide
-// material.side = THREE.DoubleSide
-
-// const material = new THREE.MeshNormalMaterial()
-// material.flatShading = true
-    
-// const material = new THREE.MeshMatcapMaterial()
-// material.matcap = matcapTexture
-    
-// const material = new THREE.MeshDepthMaterial()
-    
-// const material = new THREE.MeshLambertMaterial()
-
-// const material = new THREE.MeshPhongMaterial()
-// material.shininess = 100
-// material.specular = new THREE.Color(0x1188ff)
-    
-// const material = new THREE.MeshToonMaterial()   
-// material.gradientMap = gradientTexture
-    
 const material = new THREE.MeshStandardMaterial()
 material.metalness = 0
 material.roughness = 1
@@ -87,9 +45,8 @@ material.metalnessMap = doorMetalnessTexture
 material.roughnessMap = doorRoughnessTexture
 material.normalMap = doorNormalTexture
 material.normalScale.set(0.5,0.5)
-material.transparent = true
-//material.alphaMap = doorAlphaTexture
 
+// GUI
 gui.add(material, 'metalness').min(0).max(1).step(0.0001)
 gui.add(material, 'roughness').min(0).max(1).step(0.0001)
 gui.add(material, 'aoMapIntensity').min(0).max(10).step(0.0001)
@@ -143,7 +100,6 @@ pointLight.position.x = 2
 pointLight.position.y = 3
 pointLight.position.z = 4
 scene.add(pointLight)
-
 
 /**
  * Sizes
@@ -204,7 +160,7 @@ const tick = () =>
     // Update objects
     sphere.rotation.x = elapsedTime * 1.6
     sphere.rotation.y = elapsedTime * 1.6
-    plane.rotation.y = elapsedTime * 1
+    plane.rotation.y = elapsedTime
     capsule.rotation.y = elapsedTime * 1.6
     donut.rotation.z = elapsedTime * 2
     donut.rotation.x = elapsedTime * 2
@@ -218,60 +174,4 @@ const tick = () =>
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
 }
-
 tick()
-
-
-
-
-/**
- * ShoeBox
- */
-/*
-// Ground
-const ground = new THREE.Mesh(
-    new  THREE.PlaneGeometry(5, 3),
-    material
-)
-ground.rotation.x = Math.PI * 0.5
-ground.position.y = - 1.0
-
-// Roof
-const roof = new THREE.Mesh(
-    new  THREE.PlaneGeometry(5, 3),
-    material
-)
-roof.rotation.x = Math.PI * 0.5
-roof.position.y =  2
-
-// BackWall
-const wall = new THREE.Mesh(
-    new  THREE.PlaneGeometry(5, 3),
-    material
-)
-wall.position.z = - 1.5
-wall.position.y = 0.5
-
-
-// LeftWall
-const leftWall = new THREE.Mesh(
-    new  THREE.PlaneGeometry(3, 3),
-    material
-)
-leftWall.position.y = 0.5
-leftWall.position.x = - 2.5
-leftWall.rotation.y = Math.PI * 2.5
-
-// RightWall
-const rightWall = new THREE.Mesh(
-    new  THREE.PlaneGeometry(3, 3),
-    material
-)
-rightWall.position.y = 0.5
-rightWall.position.x = 2.5
-rightWall.rotation.y = Math.PI * 2.5
-
-// Add shoeBox
-// scene.add(ground, wall, roof, leftWall, rightWall)
-
- */
