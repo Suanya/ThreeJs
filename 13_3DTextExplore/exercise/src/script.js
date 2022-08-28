@@ -26,7 +26,7 @@ const fontLoader = new FontLoader()
 
 // EXPLORE
 fontLoader.load(
-    'fonts/jetBrains Mono SemiBold_Regular.json',
+    'fonts/helvetiker_regular.typeface.json',
     (font) =>
     {
         const exploreGeometry = new TextGeometry(
@@ -145,7 +145,7 @@ fontLoader.load(
 
 // YOUR
 fontLoader.load(
-    'fonts/jetBrains Mono SemiBold_Regular.json',
+    'fonts/helvetiker_regular.typeface.json',
     (font) =>
     {
         const yourGeometry = new TextGeometry(
@@ -179,7 +179,7 @@ fontLoader.load(
 
 // EXCITEMENT
 fontLoader.load(
-    'fonts/jetBrains Mono SemiBold_Regular.json',
+    'fonts/helvetiker_regular.typeface.json',
     (font) =>
     {
         const excitementGeometry = new TextGeometry(
